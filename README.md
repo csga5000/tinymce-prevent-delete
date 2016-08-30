@@ -6,7 +6,9 @@ I made it for my own purposes, but since it took a lot of time and messing with 
 ## Usage
 index.html
 ```html
+...
 <script src="preventdelete.js"></script>
+...
 ```
 somefile.js
 ```javascript
