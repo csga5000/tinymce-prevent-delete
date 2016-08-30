@@ -1,7 +1,7 @@
 # tinymce-prevent-delete
 This is meant to work with tinymce's noneditable plugin and will prevent the deletion of non-editable elements
 
-I made it for my own purposes, but since it took a lot of time and messing with to get working I figured I'd share it.  That being said it may not work for you.  I've tested it's functionality on tinymce version 4.4.1
+I made it for my own purposes, but since it took a lot of time and messing with to get working I figured I'd share it.  That being said it may not work for you if you're not using it in a similar way to me.  I've tested it's functionality on tinymce version 4.4.1.
 
 ## Usage
 index.html
@@ -29,3 +29,7 @@ If it's not working for you consider formatting your tinymce editor's content to
 	<p><strong class="mceNonEditable">yeah this grain is super golden: </strong>&nbsp;</p>
 </div>
 ```
+
+
+#Legal stuff:
+Use my preventdelete plugin for whatever you like.  Modify it however you like.  I'm not responsible for what you do with it and I give no assurances of it's quality or functionality.
