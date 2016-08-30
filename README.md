@@ -1,7 +1,7 @@
 # tinymce-prevent-delete
 This is meant to work with tinymce's noneditable plugin and will prevent the deletion of non-editable elements
 
-I made it for my own purposes, but since it took a lot of time and messing with to get working I figured I'd share it.  That being said it may not work for you.
+I made it for my own purposes, but since it took a lot of time and messing with to get working I figured I'd share it.  That being said it may not work for you.  I've tested it's functionality on tinymce version 4.4.1
 
 ## Usage
 index.html
