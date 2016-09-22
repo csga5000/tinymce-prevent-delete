@@ -49,7 +49,10 @@ https://jsfiddle.net/5a5p5vz7/
   - Pushing ctrl/alt backspace/delete will not do anything if the code determines that it will remove non-removable code.  I have not fixed this because I don't know an easy way to change what will be deleted or to delete text manually without changing the cursor location.  
   - I believe there are some odd cases where you can still delete non-deletable things.  I do intend to address this one at some point.
   
-Feel free to fix any flaws yourself and submit a pull request.  The code isn't THAT complicated and I annotated it well enough.  I don't know of a better alternative for you if you wish to mimic this functionality.
+Feel free to fix any flaws yourself and submit a pull request.  The code isn't THAT complicated and I annotated it well enough.
+
+### Why use this library?
+There's no real better alternatives I know of if you need this functionality.  If you have changes, you can edit my code.  If you want to tackle the issue yourself, let me know if you come up with something better.  I'll do my best to be active if you have issues or pull requests, though I may take a few days to address things.
 
 
 ###Last note:
