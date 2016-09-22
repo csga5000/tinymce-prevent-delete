@@ -1,4 +1,8 @@
 (function() {
+	Array.prototype.contains = function (e) {
+		return this.indexOf(e) > -1
+	}
+
 	function PreventDelete() {
 		var self = this
 
@@ -26,7 +30,7 @@
 
 			var c = evt.keyCode
 
-			return [8, 9, 13, 46].contains(c) || r(c, 48, 57) || r(c, 65, 90) || r(c, 96, 111) || r(c, 186, 192) || r(c, 219, 222)
+			return [8, 9, 13, 46].arrayContains(c) || r(c, 48, 57) || r(c, 65, 90) || r(c, 96, 111) || r(c, 186, 192) || r(c, 219, 222)
 
 		}
 		this.cancelKey = function(evt) {
@@ -35,7 +39,7 @@
 			return false
 		}
 		this.check = function(node) {
-			return node.classList && (node.classList.contains("mceNonEditable") || self.checkChildren(node))
+			return node.classList && (node.classList.arrayContains("mceNonEditable") || self.checkChildren(node))
 		}
 		this.checkChildren = function(node) {
 			if (!node)
@@ -47,7 +51,7 @@
 			for (var i = 0; i < children.length && !hasClass; i++) {
 				var cnode = children[i]
 
-				hasClass = cnode.classList && (cnode.classList.contains("mceNonEditable") || self.checkChildren(cnode))
+				hasClass = cnode.classList && (cnode.classList.arrayContains("mceNonEditable") || self.checkChildren(cnode))
 			}
 
 			return hasClass
@@ -63,7 +67,7 @@
 				var back = evt.keyCode == 8
 				var del = evt.keyCode == 46
 
-				var conNoEdit = (range.endContainer.classList && range.endContainer.classList.contains('mceNonEditable')) || self.checkChildren(range.endContainer)
+				var conNoEdit = (range.endContainer.classList && range.endContainer.classList.arrayContains('mceNonEditable')) || self.checkChildren(range.endContainer)
 
 				var delin = del && range.endContainer.data && (range.endOffset+(range.endContainer.data.charCodeAt(0) === 65279)) < (range.endContainer.data || "").length
 				var backin = back && range.startContainer.data && range.startOffset > (range.startContainer.data.charCodeAt(0) === 65279);
@@ -99,7 +103,7 @@
 						next = cont.nextSibling
 					}
 
-					if (self.checkChildren(next) || (next.classList && next.classList.contains("mceNonEditable")))
+					if (self.checkChildren(next) || (next.classList && next.classList.arrayContains("mceNonEditable")))
 						return self.cancelKey(evt)
 				}
 				if (back) {
@@ -114,7 +118,7 @@
 						prev = cont.previousSibling
 					}
 
-					if (self.checkChildren(prev) || (prev.classList && prev.classList.contains("mceNonEditable")))
+					if (self.checkChildren(prev) || (prev.classList && prev.classList.arrayContains("mceNonEditable")))
 						return self.cancelKey(evt)
 				}
 
