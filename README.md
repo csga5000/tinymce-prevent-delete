@@ -45,6 +45,13 @@ If you're still having issues, report one here, or dive into the code yourself, 
 
 https://jsfiddle.net/5a5p5vz7/
 
+### Known Flaws
+  - Pushing ctrl/alt backspace/delete will not do anything if the code determines that it will remove non-removable code.  I have not fixed this because I don't know an easy way to change what will be deleted or to delete text manually without changing the cursor location.  
+  - I believe there are some odd cases where you can still delete non-deletable things.  I do intend to address this one at some point.
+  
+Feel free to fix any flaws yourself and submit a pull request.  The code isn't THAT complicated and I annotated it well enough.  I don't know of a better alternative for you if you wish to mimic this functionality.
+
+
 ###Last note:
 I added a function to the array prototype.  Array.prototype.contains, which means if something else does the same and the function does not act the same then one of the programs may break.
 
