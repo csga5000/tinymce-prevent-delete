@@ -28,7 +28,7 @@ tinymce.init({
 
 NOTE!  You must have a element with id="document_root" in your tinymce's text content.  (If this is impossible, you could probably easily adjust my code, check out lines 96 and 111 of preventdelete.js.  This is meant to prevent my code from traversing too far up the dom.
 
-IF you're having issues, you may beable to get it to work better by formatting your data like this:
+If it's not working for you consider formatting your tinymce editor's content to look more like this:
 
 ```html
 <div id="document_root">
@@ -57,8 +57,6 @@ There's no real better alternatives I know of if you need this functionality.  I
 
 ###Last note:
 I added a function to the array prototype.  Array.prototype.contains, which means if something else does the same and the function does not act the same then one of the programs may break.
-
-If it's not working for you consider formatting your tinymce editor's content to look more like this:
 
 #Legal stuff:
 Use my preventdelete plugin for whatever you like.  Modify it however you like.  I'm not responsible for what you do with it and I give no assurances of it's quality or functionality.
