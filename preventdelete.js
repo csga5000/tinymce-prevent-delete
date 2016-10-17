@@ -101,20 +101,19 @@
 			return false
 		}
 		this.check = function(node) {
-			return node.classList && (node.classList.contains("mceNonEditable") || self.checkChildren(node))
+			return node.classList && (node.classList.contains("mceNonEditable") || self.checkParents(node))
 		}
-		this.checkChildren = function(node) {
+		this.checkParents = function(node) {
 			if (!node)
-				return true
+			 return true
 
-			var children = node.childNodes
-			var hasClass = false
+     var parentNode = node, hasClass = false;
 
-			for (var i = 0; i < children.length && !hasClass; i++) {
-				var cnode = children[i]
-
-				hasClass = cnode.classList && (cnode.classList.contains("mceNonEditable") || self.checkChildren(cnode))
-			}
+			while (!hasClass && (parentNode = parentNode.parentElement) ) {
+      //console.log(parentNode)
+      if (parentNode.id === 'document_root') break;
+      hasClass = parentNode.classList && (parentNode.classList.contains("mceNonEditable") || self.checkParents(parentNode))
+     }
 
 			return hasClass
 		}
