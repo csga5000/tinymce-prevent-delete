@@ -105,15 +105,17 @@
 		}
 		this.checkParents = function(node) {
 			if (!node)
-			 return true
+				return true
 
-     var parentNode = node, hasClass = false;
+			var parentNode = node, hasClass = false;
 
 			while (!hasClass && (parentNode = parentNode.parentElement) ) {
-      //console.log(parentNode)
-      if (parentNode.id === 'document_root') break;
-      hasClass = parentNode.classList && (parentNode.classList.contains("mceNonEditable") || self.checkParents(parentNode))
-     }
+				//console.log(parentNode)
+				if (parentNode.id === 'document_root')
+					break
+
+				hasClass = parentNode.classList && (parentNode.classList.contains("mceNonEditable") || self.checkParents(parentNode))
+			}
 
 			return hasClass
 		}
