@@ -119,6 +119,21 @@
 
 			return hasClass
 		}
+		this.checkChildren = function(node) {
+			if (!node)
+				return false
+
+			var children = node.childNodes
+			var hasClass = false;
+
+			for (var i = 0; i < children.length && !hasClass; i++) {
+				var cnode = children[i]
+
+				hasClass = cnode.classList && (cnode.classList.contains("mceNonEditable")) || self.checkChildren(cnode)
+			}
+
+			return hasClass
+		}
 
 		this.logElem = function(elem) {
 			var e = {}
@@ -155,6 +170,10 @@
 					if (range.endContainer === c)
 						break
 				}
+
+				var end = range.endContainer
+				if (end && range.endOffset === 0 && (self.check(end) || self.checkChildren(end)))
+					return self.cancelKey(evt)
 
 				if (conNoEdit)
 					return self.cancelKey(evt)
@@ -198,7 +217,7 @@
 					if (!next)
 						return self.cancelKey(evt)
 
-					if (self.check(next))
+					if (self.check(next) || self.checkChildren(next))
 						return self.cancelKey(evt)
 				}
 				//Keypress was back and will effect the previouselement
