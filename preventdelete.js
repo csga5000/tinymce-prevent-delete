@@ -150,13 +150,18 @@
 
 		tinymce.PluginManager.add('preventdelete', function(ed, link) {
 			ed.on('keydown', function(evt) {
-				var range = tinymce.activeEditor.selection.getRng()
-
-				self.logElem(range.startContainer)
 
 				if (!self.keyWillDelete(evt))
 					return true;
+                
+                var selected = tinymce.activeEditor.selection.getNode()
+                if (self.check(selected) || self.checkChildren(selected)){
+                	return self.cancelKey(evt)
+                }
+                
+				var range = tinymce.activeEditor.selection.getRng()
 
+				self.logElem(range.startContainer)
 
 				var back = evt.keyCode == 8
 				var del = evt.keyCode == 46
