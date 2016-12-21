@@ -26,19 +26,6 @@ tinymce.init({
 })
 ```
 
-NOTE!  You must have a element with id="document_root" in your tinymce's text content.  (If this is impossible, you could probably easily adjust my code, check out lines 96 and 111 of preventdelete.js.  This is meant to prevent my code from traversing too far up the dom.
-
-If it's not working for you consider formatting your tinymce editor's content to look more like this:
-
-```html
-<div id="document_root">
-	<p><strong class="mceNonEditable">Some field: </strong>&nbsp;</p>
-	<p><strong class="mceNonEditable">Another one: </strong>&nbsp;</p>
-	<p><strong class="mceNonEditable">This field is like the others, but has better grain: </strong>&nbsp;</p>
-	<p><strong class="mceNonEditable">yeah this grain is super golden: </strong>&nbsp;</p>
-</div>
-```
-
 If you're still having issues, report one here, or dive into the code yourself, and try to fix it.  If you to make a pull request once you do.
 
 ###JSFiddle:
@@ -58,5 +45,6 @@ There's no real better alternatives I know of if you need this functionality.  I
 ###Last note:
 I added a function to the array prototype.  Array.prototype.contains, which means if something else does the same and the function does not act the same then one of the programs may break.
 
-#Legal stuff:
-Use my preventdelete plugin for whatever you like.  Modify it however you like.  I'm not responsible for what you do with it and I give no assurances of it's quality or functionality.
+#License:
+The project is licensed under the AGPLv3+.
+
