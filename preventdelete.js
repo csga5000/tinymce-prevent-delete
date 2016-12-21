@@ -42,33 +42,34 @@
 			return false
 		}
 
+		this.root_id = 'tinymce'
+		this.preventdelete_class = 'mceNonEditable'
+
 		this.nextElement = function(elem) {
-			var cont = elem
-			var next = cont.nextSibling
+			var $elem = $(elem)
+			var next_sibling = $elem.next()
+			while(next_sibling.length == 0){
+                $elem = $elem.parent()
+                if($elem.attr('id') == self.root_id)
+                	return false
 
-			while (!next) {
-				cont = cont.parentElement
-
-				if (cont.id === 'document_root')
-					return false
-
-				next = cont.nextSibling
+                next_sibling = $elem.next()
 			}
-			return next
+
+			return next_sibling
 		}
 		this.prevElement = function(elem) {
-			var cont = elem
-			var prev = cont.previousSibling
+			var $elem = $(elem)
+			var prev_sibling = $elem.prev()
+			while(prev_sibling.length == 0){
+                $elem = $elem.parent()
+                if($elem.attr('id') == self.root_id)
+                	return false
 
-			while (!prev) {
-				cont = cont.parentElement
-
-				if (cont.id === 'document_root')
-					return false
-
-				prev = cont.previousSibling
+                prev_sibling = $elem.prev()
 			}
-			return prev
+
+			return prev_sibling
 		}
 
 		this.keyWillDelete = function(evt) {
@@ -101,19 +102,19 @@
 			return false
 		}
 		this.check = function(node) {
-			return $(node).hasClass('mceNonEditable')
+			return $(node).hasClass(self.preventdelete_class)
 		}
 		this.checkParents = function(node) {
 			if (!node)
 				return true
 
-			return $(node).parents('.mceNonEditable').length > 0
+			return $(node).parents('.'+self.preventdelete_class).length > 0
 		}
 		this.checkChildren = function(node) {
 			if (!node)
 				return false
 
-			return $(node).find('.mceNonEditable').length > 0
+			return $(node).find('.'+self.preventdelete_class).length > 0
 		}
 
 		this.logElem = function(elem) {
