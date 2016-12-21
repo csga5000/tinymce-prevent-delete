@@ -101,38 +101,19 @@
 			return false
 		}
 		this.check = function(node) {
-			return node.classList && (node.classList.contains("mceNonEditable") || self.checkParents(node))
+			return $(node).hasClass('mceNonEditable')
 		}
 		this.checkParents = function(node) {
 			if (!node)
 				return true
 
-			var parentNode = node, hasClass = false;
-
-			while (!hasClass && (parentNode = parentNode.parentElement) ) {
-				//console.log(parentNode)
-				if (parentNode.id === 'document_root')
-					break
-
-				hasClass = parentNode.classList && (parentNode.classList.contains("mceNonEditable") || self.checkParents(parentNode))
-			}
-
-			return hasClass
+			return $(node).parents('.mceNonEditable').length > 0
 		}
 		this.checkChildren = function(node) {
 			if (!node)
 				return false
 
-			var children = node.childNodes
-			var hasClass = false;
-
-			for (var i = 0; i < children.length && !hasClass; i++) {
-				var cnode = children[i]
-
-				hasClass = cnode.classList && (cnode.classList.contains("mceNonEditable")) || self.checkChildren(cnode)
-			}
-
-			return hasClass
+			return $(node).find('.mceNonEditable').length > 0
 		}
 
 		this.logElem = function(elem) {
