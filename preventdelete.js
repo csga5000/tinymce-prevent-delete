@@ -42,33 +42,34 @@
 			return false
 		}
 
+		this.root_id = 'tinymce'
+		this.preventdelete_class = 'mceNonEditable'
+
 		this.nextElement = function(elem) {
-			var cont = elem
-			var next = cont.nextSibling
+			var $elem = $(elem)
+			var next_sibling = $elem.next()
+			while(next_sibling.length == 0){
+                $elem = $elem.parent()
+                if($elem.attr('id') == self.root_id)
+                	return false
 
-			while (!next) {
-				cont = cont.parentElement
-
-				if (cont.id === 'document_root')
-					return false
-
-				next = cont.nextSibling
+                next_sibling = $elem.next()
 			}
-			return next
+
+			return next_sibling
 		}
 		this.prevElement = function(elem) {
-			var cont = elem
-			var prev = cont.previousSibling
+			var $elem = $(elem)
+			var prev_sibling = $elem.prev()
+			while(prev_sibling.length == 0){
+                $elem = $elem.parent()
+                if($elem.attr('id') == self.root_id)
+                	return false
 
-			while (!prev) {
-				cont = cont.parentElement
-
-				if (cont.id === 'document_root')
-					return false
-
-				prev = cont.previousSibling
+                prev_sibling = $elem.prev()
 			}
-			return prev
+
+			return prev_sibling
 		}
 
 		this.keyWillDelete = function(evt) {
@@ -101,38 +102,19 @@
 			return false
 		}
 		this.check = function(node) {
-			return node.classList && (node.classList.contains("mceNonEditable") || self.checkParents(node))
+			return $(node).hasClass(self.preventdelete_class)
 		}
 		this.checkParents = function(node) {
 			if (!node)
 				return true
 
-			var parentNode = node, hasClass = false;
-
-			while (!hasClass && (parentNode = parentNode.parentElement) ) {
-				//console.log(parentNode)
-				if (parentNode.id === 'document_root')
-					break
-
-				hasClass = parentNode.classList && (parentNode.classList.contains("mceNonEditable") || self.checkParents(parentNode))
-			}
-
-			return hasClass
+			return $(node).parents('.'+self.preventdelete_class).length > 0
 		}
 		this.checkChildren = function(node) {
 			if (!node)
 				return false
 
-			var children = node.childNodes
-			var hasClass = false;
-
-			for (var i = 0; i < children.length && !hasClass; i++) {
-				var cnode = children[i]
-
-				hasClass = cnode.classList && (cnode.classList.contains("mceNonEditable")) || self.checkChildren(cnode)
-			}
-
-			return hasClass
+			return $(node).find('.'+self.preventdelete_class).length > 0
 		}
 
 		this.logElem = function(elem) {
@@ -150,13 +132,18 @@
 
 		tinymce.PluginManager.add('preventdelete', function(ed, link) {
 			ed.on('keydown', function(evt) {
-				var range = tinymce.activeEditor.selection.getRng()
-
-				self.logElem(range.startContainer)
 
 				if (!self.keyWillDelete(evt))
 					return true;
+                
+                var selected = tinymce.activeEditor.selection.getNode()
+                if (self.check(selected) || self.checkChildren(selected)){
+                	return self.cancelKey(evt)
+                }
+                
+				var range = tinymce.activeEditor.selection.getRng()
 
+				self.logElem(range.startContainer)
 
 				var back = evt.keyCode == 8
 				var del = evt.keyCode == 46
