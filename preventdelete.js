@@ -209,6 +209,10 @@
 				}
 				//Keypress was back and will effect the previouselement
 				if (back) {
+					//Needed when the container is empty
+					if(range.startContainer === range.endContainer)
+						return self.cancelKey(evt)
+					
 					var prev = self.prevElement(range.startContainer)
 
 					if (self.check(prev))
