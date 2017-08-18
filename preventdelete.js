@@ -213,6 +213,11 @@
 
 					if (self.check(prev))
 						return self.cancelKey(evt)
+					
+					if(range.startContainer === range.endContainer)
+						if(typeof(prev.prevObject[0].className) !== undefined) 
+							if(prev.prevObject[0].className === 'mceEditable')
+								return self.cancelKey(evt)					
 				}
 
 			})
