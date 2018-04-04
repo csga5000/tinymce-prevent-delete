@@ -1,8 +1,7 @@
 (function() {
-	Array.prototype.contains = function (e) {
-		return this.indexOf(e) > -1
-	}
-
+    function contains(target, e) {
+      return target.indexOf(e) > -1
+    }
 	function PreventDelete() {
 		var self = this
 
@@ -16,7 +15,7 @@
 			left = left === false ? false : true
 
 			for (var i = left ? pos-1 : pos; left ? i > 0 : i < str.length; left ? i-- : i++) {
-				if ([160, 32].contains(str.charCodeAt(i)))
+				if (contains([160, 32], str.charCodeAt(i)))
 					continue
 				else
 					return true
@@ -30,7 +29,7 @@
 			left = left === false ? false : true
 
 			for (var i = left ? pos-1 : pos; left ? i > 0 : i < str.length; left ? i-- : i++) {
-				var isSpace = [160, 32].contains(str.charCodeAt(i))
+                                var isSpace = contains([160, 32], str.charCodeAt(i))
 				if (!space && isSpace)
 					space = true
 				else if (!text && !isSpace)
@@ -42,34 +41,33 @@
 			return false
 		}
 
-		this.root_id = 'tinymce'
-		this.preventdelete_class = 'mceNonEditable'
-
 		this.nextElement = function(elem) {
-			var $elem = $(elem)
-			var next_sibling = $elem.next()
-			while(next_sibling.length == 0){
-                $elem = $elem.parent()
-                if($elem.attr('id') == self.root_id)
-                	return false
+			var cont = elem
+			var next = cont.nextSibling
 
-                next_sibling = $elem.next()
+			while (!next) {
+				cont = cont.parentElement
+
+				if (cont.id === 'document_root')
+					return false
+
+				next = cont.nextSibling
 			}
-
-			return next_sibling
+			return next
 		}
 		this.prevElement = function(elem) {
-			var $elem = $(elem)
-			var prev_sibling = $elem.prev()
-			while(prev_sibling.length == 0){
-                $elem = $elem.parent()
-                if($elem.attr('id') == self.root_id)
-                	return false
+			var cont = elem
+			var prev = cont.previousSibling
 
-                prev_sibling = $elem.prev()
+			while (!prev) {
+				cont = cont.parentElement
+
+				if (cont.id === 'document_root')
+					return false
+
+				prev = cont.previousSibling
 			}
-
-			return prev_sibling
+			return prev
 		}
 
 		this.keyWillDelete = function(evt) {
@@ -77,13 +75,10 @@
 			In trying to figure out how to detect if a key was relevant, I appended all the keycodes for keys on my keyboard that would "delete" selected text, and sorted.  Generated the range blow:
 			Deleting
 			8, 9, 13, 46, 48-57, 65-90, 96-111, 186-192, 219-222
-
 			I did the same thign with keys that wouldn't and got these below
 			Not harmful
 			16-19, 27, 33-40, 45, 91-93, 112-123, 144
-
 			You should note, since it's onkeydown it doesn't change the code if you have alt or ctrl or something pressed.  It makes it fewer keycombos actually.
-
 			I'm pretty sure in these "deleting" keys will still "delete" if shift is held
 			*/
 
@@ -91,9 +86,9 @@
 
 			//ctrl+x or ctrl+back/del will all delete, but otherwise it probably won't
 			if (evt.ctrlKey)
-				return evt.key == 'x' || [8, 46].contains(c)
+                           return evt.key == 'x' || contains([8, 46], c)
 
-			return [8, 9, 13, 46].contains(c) || r(c, 48, 57) || r(c, 65, 90) || r(c, 96, 111) || r(c, 186, 192) || r(c, 219, 222)
+                        return contains([8, 9, 13, 46], c) || r(c, 48, 57) || r(c, 65, 90) || r(c, 96, 111) || r(c, 186, 192) || r(c, 219, 222)
 
 		}
 		this.cancelKey = function(evt) {
@@ -102,19 +97,22 @@
 			return false
 		}
 		this.check = function(node) {
-			return $(node).hasClass(self.preventdelete_class)
-		}
-		this.checkParents = function(node) {
-			if (!node)
-				return true
-
-			return $(node).parents('.'+self.preventdelete_class).length > 0
+			return node.classList && (node.classList.contains("mceNonEditable") || self.checkChildren(node))
 		}
 		this.checkChildren = function(node) {
 			if (!node)
-				return false
+				return true
 
-			return $(node).find('.'+self.preventdelete_class).length > 0
+			var children = node.childNodes
+			var hasClass = false
+
+			for (var i = 0; i < children.length && !hasClass; i++) {
+				var cnode = children[i]
+
+				hasClass = cnode.classList && (cnode.classList.contains("mceNonEditable") || self.checkChildren(cnode))
+			}
+
+			return hasClass
 		}
 
 		this.logElem = function(elem) {
@@ -132,18 +130,13 @@
 
 		tinymce.PluginManager.add('preventdelete', function(ed, link) {
 			ed.on('keydown', function(evt) {
-
-				if (!self.keyWillDelete(evt))
-					return true;
-                
-                var selected = tinymce.activeEditor.selection.getNode()
-                if (self.check(selected) || self.checkChildren(selected)){
-                	return self.cancelKey(evt)
-                }
-                
 				var range = tinymce.activeEditor.selection.getRng()
 
 				self.logElem(range.startContainer)
+
+				if (!self.keyWillDelete(evt))
+					return true;
+
 
 				var back = evt.keyCode == 8
 				var del = evt.keyCode == 46
@@ -157,10 +150,6 @@
 					if (range.endContainer === c)
 						break
 				}
-
-				var end = range.endContainer
-				if (end && range.endOffset === 0 && (self.check(end) || self.checkChildren(end)))
-					return self.cancelKey(evt)
 
 				if (conNoEdit)
 					return self.cancelKey(evt)
@@ -204,7 +193,7 @@
 					if (!next)
 						return self.cancelKey(evt)
 
-					if (self.check(next) || self.checkChildren(next))
+					if (self.check(next))
 						return self.cancelKey(evt)
 				}
 				//Keypress was back and will effect the previouselement
@@ -220,3 +209,4 @@
 	}
 	new PreventDelete()
 })()
+
