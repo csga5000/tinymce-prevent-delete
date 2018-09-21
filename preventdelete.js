@@ -129,93 +129,112 @@
 			)
 
 		}
+		
+		this.checkEvent = function(evt) {
+
+            if (evt.keyCode && !self.keyWillDelete(evt))
+                return true;
+
+            var selected = tinymce.activeEditor.selection.getNode();
+            if (self.check(selected) || self.checkChildren(selected)) {
+                return self.cancelKey(evt);
+            }
+
+            var range = tinymce.activeEditor.selection.getRng();
+
+            self.logElem(range.startContainer);
+
+            var back = evt.keyCode && evt.keyCode == 8;
+            var del = evt.keyCode && evt.keyCode == 46;
+
+            var conNoEdit;
+
+            //Ensure nothing in the span between elems is noneditable
+            for (var c = range.startContainer; !conNoEdit && c; c = c.nextSibling) {
+                conNoEdit = conNoEdit || self.check(c);
+
+                if (range.endContainer === c) {
+                    break;
+                }
+            }
+
+            var end = range.endContainer;
+            if (end && range.endOffset === 0 && (self.check(end) || self.checkChildren(end))) {
+                return self.cancelKey(evt);
+            }
+
+            if (conNoEdit) {
+                return self.cancelKey(evt);
+            }
+
+
+            var endData = range.endContainer.data || "";
+            var zwnbsp = range.startContainer.data && range.startContainer.data.charCodeAt(0) === 65279;
+
+            var delin = del && range.endContainer.data && (range.endOffset < endData.length) && !(zwnbsp && endData.length === 1);
+            var backin = back && range.startContainer.data && range.startOffset > zwnbsp;
+
+            var noselection = range.startOffset === range.endOffset;
+
+            var ctrlDanger = evt.ctrlKey && (back || del) && !hasStopText(range.startContainer.data, range.startOffset, back);
+
+            if (delin || backin) {
+                //Allow the delete
+                if (!ctrlDanger) {
+                    return true;
+                }
+            }
+
+            // If ctrl is a danger we need to skip this block and check the siblings which is done in the rest of this function
+            if (!ctrlDanger) {
+                if (del && noselection && (range.startOffset + 1) < range.endContainer.childElementCount) {
+                    var elem = range.endContainer.childNodes[range.startOffset + 1];
+                    return self.check(elem) ? self.cancelKey(evt) : true;
+                }
+
+                //The range is within this container
+                if (range.startOffset !== range.endOffset) {
+
+                    //If this container is non-editable, cancel the event, otherwise allow the event
+                    return conNoEdit ? self.cancelKey(evt) : true;
+                }
+            }
+
+            //Keypress was del and will effect the next element
+            if (del) {
+                var next = self.nextElement(range.endContainer);
+                //No next element, so we don't need to delete anyway
+                if (!next) {
+                    return self.cancelKey(evt);
+                }
+
+                if (self.check(next) || self.checkChildren(next)) {
+                    return self.cancelKey(evt);
+                }
+            }
+            //Keypress was back and will effect the previouselement
+            if (back) {
+                var prev = self.prevElement(range.startContainer);
+
+                if (self.check(prev)) {
+                    return self.cancelKey(evt);
+                }
+            }
+
+        };
 
 		tinymce.PluginManager.add('preventdelete', function(ed, link) {
-			ed.on('keydown', function(evt) {
-
-				if (!self.keyWillDelete(evt))
-					return true;
-                
-                var selected = tinymce.activeEditor.selection.getNode()
-                if (self.check(selected) || self.checkChildren(selected)){
-                	return self.cancelKey(evt)
-                }
-                
-				var range = tinymce.activeEditor.selection.getRng()
-
-				self.logElem(range.startContainer)
-
-				var back = evt.keyCode == 8
-				var del = evt.keyCode == 46
-
-				var conNoEdit
-
-				//Ensure nothing in the span between elems is noneditable
-				for (var c = range.startContainer; !conNoEdit && c; c = c.nextSibling) {
-					conNoEdit = conNoEdit || self.check(c)
-
-					if (range.endContainer === c)
-						break
-				}
-
-				var end = range.endContainer
-				if (end && range.endOffset === 0 && (self.check(end) || self.checkChildren(end)))
-					return self.cancelKey(evt)
-
-				if (conNoEdit)
-					return self.cancelKey(evt)
-
-
-				var endData = (range.endContainer.data || "")
-				var zwnbsp = range.startContainer.data && range.startContainer.data.charCodeAt(0) === 65279
-
-				var delin = del && range.endContainer.data && (range.endOffset < endData.length) && !(zwnbsp && endData.length === 1)
-				var backin = back && range.startContainer.data && range.startOffset > zwnbsp;
-
-				var noselection = range.startOffset === range.endOffset
-
-				var ctrlDanger = (evt.ctrlKey && (back || del)) && !hasStopText(range.startContainer.data, range.startOffset, back)
-
-				if (delin || backin) {
-					//Allow the delete
-					if (!ctrlDanger)
-						return true
-				}
-
-				// If ctrl is a danger we need to skip this block and check the siblings which is done in the rest of this function
-				if (!ctrlDanger) {
-					if (del && noselection && (range.startOffset+1) < range.endContainer.childElementCount) {
-						var elem = range.endContainer.childNodes[range.startOffset+1]
-						return self.check(elem) ? self.cancelKey(evt) : true
-					}
-
-					//The range is within this container
-					if (range.startOffset !== range.endOffset) {
-
-						//If this container is non-editable, cancel the event, otherwise allow the event
-						return conNoEdit ? self.cancelKey(evt) : true
-					}
-				}
-
-				//Keypress was del and will effect the next element
-				if (del) {
-					var next = self.nextElement(range.endContainer)
-					//No next element, so we don't need to delete anyway
-					if (!next)
-						return self.cancelKey(evt)
-
-					if (self.check(next) || self.checkChildren(next))
-						return self.cancelKey(evt)
-				}
-				//Keypress was back and will effect the previouselement
-				if (back) {
-					var prev = self.prevElement(range.startContainer)
-
-					if (self.check(prev))
-						return self.cancelKey(evt)
-				}
-
-			})
+			ed.on('keydown', self.checkEvent);
+            		ed.on('BeforeExecCommand', function(e) {
+                		if (e.command === 'Cut' || e.command === 'Delete' || e.command === 'Paste') {
+                    		return self.checkEvent(e);
+                		}
+		
+		                return true;
+            		});
+            		ed.on('BeforeSetContent', function(e) {
+                		return self.checkEvent(e);
+            		});
 		})
 	}
 	new PreventDelete()
